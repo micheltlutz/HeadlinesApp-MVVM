@@ -11,6 +11,9 @@ import UIKit
 
 class HeadlinesTableViewController : UITableViewController {
     
+    var sourceViewModel: SourceViewModel!
+    private var headlineListViewModel: HeadlineListViewModel!
+    
     private var headlines :[Headline] = [Headline]()
     var source :Source!
     
@@ -22,31 +25,20 @@ class HeadlinesTableViewController : UITableViewController {
     
     private func updateUI() {
         
-        self.title = self.source.name
+        self.title = self.sourceViewModel.name
         
-        // get the headlines by source
-        let url = URL(string :"https://newsapi.org/v2/top-headlines?sources=\(source.id)&apiKey=c83efde0c7b14f978761eed39ea784b8")!
+        headlineListViewModel = HeadlineListViewModel(sourceViewModel: sourceViewModel){
+            self.tableView.reloadData()
+        }
         
-        URLSession.shared.dataTask(with: url) { data, _, _ in
-            
-            if let data = data {
-                
-                let json = try! JSONSerialization.jsonObject(with: data, options: [])
-                let dictionary = json as! [String:Any]
-                let headlineDictionaries = dictionary["articles"] as! [[String:Any]]
-                
-                self.headlines = headlineDictionaries.flatMap(Headline.init)
-                
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
-            }
-            
-            }.resume()
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.headlines.count
+        if headlineListViewModel != nil {
+            return headlineListViewModel.headlineViewModels.count
+        }
+        
+        return 0
     }
     
     
@@ -54,10 +46,10 @@ class HeadlinesTableViewController : UITableViewController {
       
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! HeadlineTableViewCell
         
-        let headline = self.headlines[indexPath.row]
+        let headlineViewModel = headlineListViewModel.headlineAt(index: indexPath.row)
         
-        cell.titleLabel.text = headline.title
-        cell.descriptionLabel.text = headline.description
+        cell.titleLabel.text = headlineViewModel.title
+        cell.descriptionLabel.text = headlineViewModel.description
         
         return cell
     }

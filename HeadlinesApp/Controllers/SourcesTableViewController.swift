@@ -41,7 +41,7 @@ class SourcesTableViewController : UITableViewController {
             fatalError("HeadlinesTableViewController not found")
         }
         let indexPath = (self.tableView.indexPathForSelectedRow)!
-        let source = self.sourceListViewModel.sourceAt(index: indexPath.row)
-        //headlinesTVC.source = source
+        let sourceViewModel = self.sourceListViewModel.sourceAt(index: indexPath.row)
+        headlinesTVC.sourceViewModel = sourceViewModel
     }
 }

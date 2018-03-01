@@ -33,6 +33,12 @@ class Source {
         self.name = name
         self.description = description
     }
+    
+    init(sourceViewModel: SourceViewModel) {
+        id = sourceViewModel.id
+        name = sourceViewModel.name
+        description = sourceViewModel.description
+    }
 }
 
 

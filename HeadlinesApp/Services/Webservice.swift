@@ -10,6 +10,32 @@ import Foundation
 
 class Webservice {
     
+    
+    func loadHeadLinesForSource(source: Source, completion: @escaping ([Headline]) -> ()) {
+        
+        var headLines = [Headline]()
+        
+        // get the headlines by source
+        let url = URL(string :"https://newsapi.org/v2/top-headlines?sources=\(source.id)&apiKey=c83efde0c7b14f978761eed39ea784b8")!
+        
+        URLSession.shared.dataTask(with: url) { data, _, _ in
+            
+            if let data = data {
+                
+                let json = try! JSONSerialization.jsonObject(with: data, options: [])
+                let dictionary = json as! [String:Any]
+                let headlineDictionaries = dictionary["articles"] as! [[String:Any]]
+                
+                headLines = headlineDictionaries.flatMap(Headline.init)
+                
+                DispatchQueue.main.async {
+                    completion(headLines)
+                }
+            }
+            
+            }.resume()
+    }
+    
     func loadSources(completion:@escaping ([Source]) -> ()) {
         
         var sources = [Source]()
